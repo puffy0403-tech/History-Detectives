@@ -157,3 +157,25 @@ blockquote { margin-inline: 0; border-left: 3px solid #bca36e; padding: 8px 12px
 .clues-panel label { display: grid; gap: 4px; color: var(--muted); margin-top: 5px; }
 .answer-note { display: block; color: var(--muted); white-space: pre-wrap; }
 #reading-library, .reading-source { scroll-margin-top: 16px; }
+.reading-steps [aria-current="step"] { color: #fff; background: var(--green); font-weight: 700; }
+.story-progress { color: #735a2b; font-size: 12px; font-weight: 700; margin-bottom: 8px; }
+.era-story { max-width: 830px; }
+.story-cover { display: grid; grid-template-columns: minmax(180px, 1fr) 2fr; gap: 18px; align-items: center; }
+.story-cover-image { min-height: 130px; border-radius: 8px; background: #342f21 url('/harbor-hero.jpg') center 60% / cover; }
+.story-cover h2 { margin: 7px 0; }
+.story-cover p, .story-chapters p:last-child { margin-bottom: 0; }
+.story-chapters { display: grid; gap: 10px; padding-left: 25px; }
+.story-chapters li:focus { outline: 2px solid #ad7c27; outline-offset: 2px; }
+.trade-route { margin: 14px 0 0; padding: 10px; background: #e8ede1; border-radius: 7px; }
+.trade-route figcaption, .trade-route ol { display: flex; gap: 7px; align-items: center; flex-wrap: wrap; }
+.trade-route ol { list-style: none; padding: 0; margin: 7px 0 0; font-size: 14px; }
+.trade-route li + li::before { content: '→ '; }
+.story-quiz fieldset { margin: 0 0 15px; padding: 10px; border: 1px solid var(--line); border-radius: 8px; min-inline-size: 0; }
+.story-quiz legend { font-weight: 700; }
+.story-option { display: flex; align-items: baseline; gap: 7px; padding: 5px 0; cursor: pointer; }
+.story-option input { accent-color: var(--green); }
+.story-feedback p { display: flex; align-items: center; gap: 5px; margin: 5px 0; }
+.story-feedback .back { text-decoration: underline; margin-bottom: 0; }
+@media (max-width: 580px) {
+  .story-cover { grid-template-columns: 1fr; }
+}

@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {createRoot} from 'react-dom/client';
 import {ArrowLeft, ArrowRight, BookOpen, Check, ChevronRight, Compass, Map, Search, Sparkles, Target} from 'lucide-react';
 import {units} from './units';
+import EraStory from './EraStory';
 import SourceCard, {tableClue} from './SourceCard';
 import './style.css';
 
@@ -27,6 +28,7 @@ function getFeedback(answer, unitIndex) {
 function App() {
   const [progress, setProgress] = useState(() => readStorage('history-progress'));
   const [library, setLibrary] = useState(() => readStorage('hd-lab-library'));
+  const [storyAnswers, setStoryAnswers] = useState({});
   const [returnStage, setReturnStage] = useState('read');
   const [readingTask, setReadingTask] = useState(null);
   const [index, setIndex] = useState(0);
@@ -45,7 +47,7 @@ function App() {
     setStage(next);
     window.scrollTo(0, 0);
   }
-  function open(id) {
+  function open(id, resume = false) {
     setIndex(id);
     setAnswer({claim:'', reason:'', ...progress[id]?.final,
       evidence: [...new Set([...(progress[id]?.final.evidence ?? []), ...Object.keys(library[id]?.clues ?? {})])]});
@@ -53,7 +55,8 @@ function App() {
     setReadingTask(null);
     setOriginal(null);
     setChoice(null);
-    go('materials');
+    setStoryAnswers(library[id]?.storyAnswers ?? {});
+    go(id === 0 && !(resume && library[id]?.storyComplete) ? 'story' : 'materials');
   }
   function toggle(line) {
     setAnswer(current => ({...current, evidence:current.evidence.includes(line) ? current.evidence.filter(item => item !== line) : [...current.evidence, line]}));
@@ -63,6 +66,16 @@ function App() {
     setLibrary(all);
     try { localStorage.setItem('hd-lab-library', JSON.stringify(all)); }
     catch { /* The current session can still use its clues. */ }
+  }
+
+  function updateStoryAnswers(next) {
+    setStoryAnswers(next);
+    saveReading({...reading, storyAnswers:next});
+  }
+
+  function finishStory() {
+    saveReading({...reading, storyComplete:true});
+    go('materials');
   }
 
   function markClue(text) {
@@ -137,22 +150,31 @@ function App() {
           <div className="section-head"><div className="section-title"><span className="section-icon"><Map size={24}/></span><div><h2>史料閱讀庫</h2><p>選擇一個歷史單元，先閱讀背景與史料。</p></div></div>
           <div className="meter"><span>單元進度 <strong>{count} / 3</strong></span><div aria-hidden="true">{units.map((_, id) => <i className={id < count ? 'filled' : ''} key={id}/>)}</div></div></div>
           <div className="cards">{units.map((item, id) => <article className="unit-card" key={item.title}>
-            <button className="card-button" onClick={() => open(id)}>
+            <button className="card-button" onClick={() => open(id, true)}>
               <div className={'card-image ' + item.art}><span className="case-label">{progress[id] ? <><Check size={13}/> 已完成</> : id === 2 ? <><Target size={12}/> 獨立挑戰</> : <>探究任務 0{id + 1}</>}</span></div>
-              <div className="card-body"><div className="era">{item.era}</div><h3>{item.title}</h3><p>{item.description}</p><div className="card-bottom"><span><BookOpen size={14}/>已讀 {library[id]?.read.length ?? 0} / {item.sources.length}</span><span className="circle-arrow"><ArrowRight size={18}/></span></div></div>
+              <div className="card-body"><div className="era">{item.era}</div><h3>{item.title}</h3><p>{item.description}</p>
+              {id === 0 && <span className="story-progress">{library[id]?.storyComplete ? '故事已完成 · 繼續學習' : '從時代故事開始'}</span>}
+              <div className="card-bottom"><span><BookOpen size={14}/>已讀 {library[id]?.read.length ?? 0} / {item.sources.length}</span><span className="circle-arrow"><ArrowRight size={18}/></span></div></div>
             </button>
           </article>)}</div>
         </section>
       </>}
-      {stage === 'progress' && <section className="inner-page"><h1>學習進度</h1><p className="muted">已完成 {count} / 3 個單元</p><div className="panel progress-list">{units.map((item, id) => <button key={item.title} onClick={() => open(id)}><span><strong>{item.title}</strong><small>{progress[id] ? '已完成' : '待探究'}</small></span><ChevronRight size={18}/></button>)}</div></section>}
+      {stage === 'progress' && <section className="inner-page"><h1>學習進度</h1><p className="muted">已完成 {count} / 3 個單元</p><div className="panel progress-list">{units.map((item, id) => <button key={item.title} onClick={() => open(id, true)}><span><strong>{item.title}</strong><small>{progress[id] ? '已完成' : '待探究'}</small></span><ChevronRight size={18}/></button>)}</div></section>}
       {stage !== 'map' && stage !== 'progress' && <section className="inner-page">
         <button className="back" onClick={() => go('map')}><ArrowLeft size={18}/> 回史料閱讀庫</button>
         <div className="era">{unit.era} · {unit.skill}</div>
         <h1>{unit.title}</h1>
+        {index === 0 && <ol className="reading-steps" aria-label="單元流程">
+          <li aria-current={stage === 'story' ? 'step' : undefined}>時代故事</li>
+          <li aria-current={stage === 'materials' ? 'step' : undefined}>史料與線索</li>
+          <li aria-current={['read', 'activity', 'revise', 'result'].includes(stage) ? 'step' : undefined}>探究與修正</li>
+        </ol>}
+        {stage === 'story' && <EraStory answers={storyAnswers} setAnswers={updateStoryAnswers} continueToMaterials={finishStory}/>}
         {stage === 'materials' ? <>
-          <ol className="reading-steps" aria-label="單元流程">
+          {index !== 0 && <ol className="reading-steps" aria-label="單元流程">
             {['讀背景', '看史料', '標記線索', '開始探究'].map(step => <li key={step}>{step}</li>)}
-          </ol>
+          </ol>}
+          {index === 0 && <button type="button" className="back" onClick={() => go('story')}><BookOpen size={17}/> 回看時代故事</button>}
           <div className="panel reading-intro">
             <span className="era"><BookOpen size={16}/> 背景導讀</span>
             <h2>時代背景</h2>
@@ -177,7 +199,7 @@ function App() {
             </li>)}</ul> : <p className="muted">你標記的材料會顯示在這裡，並帶入探究作答。</p>}
           </section>
           <button className="primary next" onClick={() => go(returnStage)}>{nextLabel} <ArrowRight size={17}/></button>
-        </> : <div className="question"><Search size={20}/><strong>{unit.question}</strong></div>}
+        </> : stage !== 'story' && <div className="question"><Search size={20}/><strong>{unit.question}</strong></div>}
         {(stage === 'read' || stage === 'revise') && <>
           <button className="back" onClick={() => reviewMaterials(stage)}><BookOpen size={17}/> 回看史料閱讀庫</button>
           <h2>{stage === 'revise' ? '修正你的答案' : '閱讀史料'}</h2>
