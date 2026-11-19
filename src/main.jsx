@@ -43,7 +43,7 @@ function App() {
     setAnswer(progress[id]?.final ?? {claim:'', reason:'', evidence:[]});
     setOriginal(null);
     setChoice(null);
-    go('read');
+    go('materials');
   }
   function toggle(line) {
     setAnswer(current => ({...current, evidence:current.evidence.includes(line) ? current.evidence.filter(item => item !== line) : [...current.evidence, line]}));
@@ -102,7 +102,25 @@ function App() {
         <button className="back" onClick={() => go('map')}><ArrowLeft size={18}/> 回單元地圖</button>
         <div className="era">{unit.era} · {unit.skill}</div>
         <h1>{unit.title}</h1>
-        <div className="question"><Search size={20}/><strong>{unit.question}</strong></div>
+        {stage === 'materials' ? <>
+          <div className="panel reading-intro">
+            <span className="era"><BookOpen size={16}/> 作答前閱讀</span>
+            <h2>時代背景</h2>
+            <p>{unit.background}</p>
+            {unit.readingGuide && <p><strong>閱讀提示</strong>　{unit.readingGuide}</p>}
+          </div>
+          <h2>史料教材</h2>
+          <p className="muted">以下為教學用的資料摘要與情境重構。</p>
+          <div className="two-column">{unit.sources.map((source, id) => <article className="panel source reading-source" key={source.title}>
+            <span className="era"><FileText size={15}/> 史料 {id ? 'B' : 'A'}</span>
+            <h3>{source.title}</h3>
+            <p className="muted">{source.year} · {source.author}</p>
+            {source.lines.map(line => <p key={line}>{line}</p>)}
+            <details><summary>詞語解釋</summary><p>{source.term}</p></details>
+          </article>)}</div>
+          <button className="primary next" onClick={() => go('read')}>{independent ? '開始獨立挑戰' : '開始圈選證據與作答'} <ArrowRight size={17}/></button>
+        </> : <div className="question"><Search size={20}/><strong>{unit.question}</strong></div>}
+        {stage === 'read' && <button className="back" onClick={() => go('materials')}><BookOpen size={17}/> 回看史料教材</button>}
         {(stage === 'read' || stage === 'revise') && <>
           <h2>{stage === 'revise' ? '修正你的答案' : '閱讀史料'}</h2>
           <p className="muted">{independent ? '先獨立完成作答，提交後再查看回饋。' : '點選句子，即可標記為你的證據。'}</p>

@@ -130,3 +130,7 @@ blockquote { margin-inline: 0; border-left: 3px solid #bca36e; padding: 8px 12px
   .cards, .two-column { grid-template-columns: 1fr; }
   .card-body { padding-inline: 15px; }
 }
+.reading-intro { margin-bottom: 24px; }
+.reading-intro h2 { margin: 8px 0; }
+.reading-intro p:last-child { margin-bottom: 0; }
+.reading-source > p:not(.muted) { margin-bottom: 10px; }
