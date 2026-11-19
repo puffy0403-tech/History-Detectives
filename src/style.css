@@ -134,3 +134,26 @@ blockquote { margin-inline: 0; border-left: 3px solid #bca36e; padding: 8px 12px
 .reading-intro h2 { margin: 8px 0; }
 .reading-intro p:last-child { margin-bottom: 0; }
 .reading-source > p:not(.muted) { margin-bottom: 10px; }
+.reading-steps { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 0 0 18px; color: var(--green); }
+.reading-steps li { background: #e8ede1; padding: 6px 10px; border-radius: 6px; font-size: 13px; }
+.reading-steps li + li::before { content: '→ '; }
+.reading-heading, .clue-entry { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.reading-heading span { color: var(--muted); font-size: 13px; }
+.source-meta { font-size: 13px; color: var(--muted); }
+.source-meta div { display: grid; grid-template-columns: 6.6em 1fr; gap: 6px; margin-bottom: 5px; }
+.source-meta dt { font-weight: 700; }
+.source-meta dd { margin: 0; }
+.source a, .question a { color: #365c45; }
+.question p { margin: 5px 0; }
+.source:focus { outline: 2px solid #ad7c27; outline-offset: 2px; }
+.clue-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 12px; }
+.clue-table caption { font-weight: 700; text-align: left; margin-bottom: 6px; }
+.clue-table th, .clue-table td { padding: 6px; border: 1px solid var(--line); text-align: left; }
+.clue-table .line { margin: 0; }
+.read-status { display: inline-flex; align-items: center; gap: 5px; margin-top: 14px; padding: 6px 10px; color: var(--green); background: #e8ede1; border: 1px solid #b4c1ac; border-radius: 6px; }
+.clues-panel { margin-top: 18px; }
+.clues-panel ul { list-style: none; padding: 0; margin-bottom: 0; }
+.clues-panel li + li { border-top: 1px solid var(--line); padding-top: 10px; margin-top: 10px; }
+.clues-panel label { display: grid; gap: 4px; color: var(--muted); margin-top: 5px; }
+.answer-note { display: block; color: var(--muted); white-space: pre-wrap; }
+#reading-library, .reading-source { scroll-margin-top: 16px; }
